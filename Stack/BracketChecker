@@ -1,0 +1,29 @@
+from stack import *
+
+stack=Stack(100)
+expr=input("Expression to check: ")
+errors=0
+
+for pos, letter in enumerate(expr):
+    if letter in "{[(":
+        stack.push(letter)
+    elif letter in "}])":
+        if stack.isEmpty():
+            print(f"Error: {letter} at position {pos}.")
+            errors+=1
+        else:
+            left =stack.pop()
+            if not ((left == '(' and letter == ')') or
+            (left == '[' and letter == ']') or
+            (left == '{' and letter == '}')):
+                print(f"Error: Mismatched '{left}' and '{letter}' at position {pos}.")
+                errors+=1
+
+if stack.isEmpty() and errors ==0:
+    print("Delimiters balance in the expression: ", expr)
+else:
+    print("Expression missing right delimiter for ", stack)
+
+
+
+
