@@ -66,7 +66,7 @@ class PriorityQueue:
             raise Exception("Queue overflow")
         j=self._nItems -1
         while j >=0 and (self._pri(item) >= self._pri(self._que[j])):
-            self._que[j+1]=self._que[j]
+            self._que[j+1]=self._que[j] #moving the item to the front
             j-=1
         self._que[j+1]=item
         self._nItems+=1
@@ -76,7 +76,7 @@ class PriorityQueue:
         if self.isEmpty():
             raise Exception("Queue underflow")
         self._nItems-=1
-        front = self._que[self._nItems] # The highest-priority item (end of queue)
+        front = self._que[self._nItems] # #least value first out (end of queue)
         self._que[self._nItems]=None
         return front
 
