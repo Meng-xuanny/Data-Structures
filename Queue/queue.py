@@ -75,9 +75,9 @@ class PriorityQueue:
     def remove(self):
         if self.isEmpty():
             raise Exception("Queue underflow")
-        self._nItems-=1
-        front = self._que[self._nItems] # #least value first out (end of queue)
-        self._que[self._nItems]=None
+        front = self._que[self._nItems-1] # #least value first out (end of queue)
+        self._que[self._nItems - 1] = None
+        self._nItems -= 1
         return front
 
     def __str__(self):
@@ -89,3 +89,4 @@ priQueue.insert(30)
 priQueue.insert(20)
 print(priQueue)
 print(priQueue.remove())
+print(priQueue)

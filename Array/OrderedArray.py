@@ -47,14 +47,18 @@ class Array():
         innnerIteration=0
         for j in range(self._nItems-1, 0, -1):
             outIteration+=1
+            swapped = False  # Track if a swap happens
             for k in range(j):
                 innnerIteration+=1
                 if self._a[k]>self._a[k+1]:
                     temp = self._a[k]
                     self._a[k]=self._a[k+1]
                     self._a[k + 1]=temp
+                    swapped = True
+            if not swapped:
+                break  # Stop early if no swaps
 
-        print(outIteration+innnerIteration)
+        print(outIteration, innnerIteration)
 
     def selectionSort(self):
         outIteration = 0
@@ -72,7 +76,7 @@ class Array():
             self._a[i]=self._a[min]
             self._a[min]=temp
 
-        print(outIteration+innnerIteration)
+        print(outIteration, innnerIteration)
 
 
     def insertionSort(self):
@@ -94,14 +98,15 @@ array=Array(2)
 # array.insert(2)
 # array.insert(4)
 # array.insert(3)
+# print(array)
 # array.bubbleSort()
-# array.insert(3)
-# array.insert(4)
-# array.insert(5)
-# array.insert(2)
-# array.insert(1)
+array.insert(3)
+array.insert(4)
+array.insert(5)
+array.insert(2)
+array.insert(1)
 # array.bubbleSort()
-# array.selectionSort()
+array.selectionSort()
 # #sorting_array.insertionSort()
 # print(array)
 
@@ -115,20 +120,22 @@ class OrderedArray:
     def __len__(self):
         return self._nItems
 
-    def find(self,item):
-        left=0
-        right=self._nItems- 1
-        counter=0
-        while left<=right:
-            counter+=1
-            mid=(left+right)//2
-            if self._a[mid]==item:
+    def find(self, item):
+        left = 0
+        right = self._nItems - 1
+        counter = 0
+        while left <= right:
+            mid = (left + right) // 2
+            counter += 1
+            if self._a[mid] == item:
+                print(counter)  #iterations it takes to find the item
                 return mid
-            elif self._a[mid]>item:
-                right=mid-1
+            elif self._a[mid] > item:
+                right = mid - 1
             else:
-                left=mid+1
-        print(counter)
+                left = mid + 1
+
+        print(counter) #iterations it takes to end the loop
         return -1
 
     def find_index(self,item):
@@ -170,7 +177,7 @@ class OrderedArray:
 
     def shuffle(self):
         for i in range(self._nItems -1, 0, -1):
-            j=random.randint(0,1) # unshuffled positions
+            j=random.randint(0,i) # unshuffled positions
             temp = self._a[i]
             self._a[i] = self._a[j]
             self._a[j] = temp
@@ -180,17 +187,18 @@ class OrderedArray:
         return str(self._a[:self._nItems])
 
 orderedarray=OrderedArray(20)
-# orderedarray.insert(5)
-# orderedarray.insert(6)
-# orderedarray.insert(7)
-# orderedarray.insert(8)
-# orderedarray.insert(9)
-# print(orderedarray.find(8))
-
-orderedarray.insert(1)
-orderedarray.insert(2)
-orderedarray.insert(3)
+orderedarray.insert(5)
 orderedarray.insert(6)
+orderedarray.insert(7)
 orderedarray.insert(8)
-orderedarray.insert(10)
-print(orderedarray.find(17))
+orderedarray.insert(9)
+print(orderedarray)
+print(orderedarray.find(8))
+
+# orderedarray.insert(1)
+# orderedarray.insert(2)
+# orderedarray.insert(3)
+# orderedarray.insert(6)
+# orderedarray.insert(8)
+# orderedarray.insert(10)
+# print(orderedarray.find(17))

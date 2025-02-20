@@ -26,6 +26,7 @@ def toPostfix(formula):
     s=Stack(1000)
 
     token,formula=nextToken(formula) # Get first token
+
     while token:
         if token in "+-*/":
             while not s.isEmpty() and precedence(s.peek()) >= precedence(token):
@@ -34,8 +35,9 @@ def toPostfix(formula):
         else:
             ans.append(token) # If number, add it to output
         token,formula=nextToken(formula) # Get next token
-
-    while not s.isEmpty(): #no token left
+        # print(token, formula)
+    print(s)
+    while not s.isEmpty():
         ans += [s.pop()] # Pop remaining operators
     return ans
 
@@ -64,4 +66,4 @@ string1 = "3+5*2-8/4"
 postfix= toPostfix(string1)
 print(postfix)
 result=processPostfix(postfix)
-print(result)
+# print(result)
