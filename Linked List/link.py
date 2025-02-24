@@ -15,6 +15,9 @@ class Link:
     def setNext(self, link):
         self._next= link
 
+    def isFirst(self):
+        return self.getPrevious()==None
+
     def isLast(self):
         return self.getNext()==None
 

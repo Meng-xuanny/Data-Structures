@@ -59,13 +59,13 @@ class LinkedList:
         return result + "]"
 
 
-linked= LinkedList()
-linked.insert(1)
-linked.insert(2)
-linked.insert(3)
-linked.insert(4)
-print(linked)
-print(linked.find(3))
-linked.insertAfter(4, "a")
-print(linked)
-print(linked.delete(0))
+# linked= LinkedList()
+# linked.insert(1)
+# linked.insert(2)
+# linked.insert(3)
+# linked.insert(4)
+# print(linked)
+# print(linked.find(3))
+# linked.insertAfter(4, "a")
+# print(linked)
+# print(linked.delete(0))
