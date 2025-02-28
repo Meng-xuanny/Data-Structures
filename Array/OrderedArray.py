@@ -47,16 +47,16 @@ class Array():
         innnerIteration=0
         for j in range(self._nItems-1, 0, -1):
             outIteration+=1
-            swapped = False  # Track if a swap happens
+            # swapped = False  # Track if a swap happens
             for k in range(j):
                 innnerIteration+=1
                 if self._a[k]>self._a[k+1]:
                     temp = self._a[k]
                     self._a[k]=self._a[k+1]
                     self._a[k + 1]=temp
-                    swapped = True
-            if not swapped:
-                break  # Stop early if no swaps
+            #         swapped = True
+            # if not swapped:
+            #     break  # Stop early if no swaps
 
         print(outIteration, innnerIteration)
 
@@ -105,7 +105,7 @@ array.insert(4)
 array.insert(5)
 array.insert(2)
 array.insert(1)
-# array.bubbleSort()
+array.bubbleSort()
 array.selectionSort()
 # #sorting_array.insertionSort()
 # print(array)
@@ -186,19 +186,21 @@ class OrderedArray:
     def __str__(self):
         return str(self._a[:self._nItems])
 
-orderedarray=OrderedArray(20)
-orderedarray.insert(5)
-orderedarray.insert(6)
-orderedarray.insert(7)
-orderedarray.insert(8)
-orderedarray.insert(9)
-print(orderedarray)
-print(orderedarray.find(8))
 
-# orderedarray.insert(1)
-# orderedarray.insert(2)
-# orderedarray.insert(3)
+
+orderedarray=OrderedArray(20)
+# orderedarray.insert(5)
 # orderedarray.insert(6)
+# orderedarray.insert(7)
 # orderedarray.insert(8)
-# orderedarray.insert(10)
-# print(orderedarray.find(17))
+# orderedarray.insert(9)
+# print(orderedarray)
+# print(orderedarray.find(8))
+
+orderedarray.insert(1)
+orderedarray.insert(2)
+orderedarray.insert(3)
+orderedarray.insert(6)
+orderedarray.insert(8)
+orderedarray.insert(10)
+print(orderedarray.find(17))

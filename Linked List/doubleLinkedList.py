@@ -15,16 +15,22 @@ class DoublyLinkedList(LinkedList):
 
     def setFirst(self, link):
         if link is None or isinstance(link, Link):
+            if self._first:  # If the list is not empty
+                link.setNext(self._first)  # New first node points to the old first
+                self._first.setPrevious(link)  # Old first node points back to the new first
             self._first = link
-            if (self._last is None or link is None):
+            if self.getLast() is None:  # Only reset _last if the list is empty
                 self._last = link  #update both ends so that when a node is inserted, it is both the last and first
         else:
             raise Exception("First link must be Link or None.")
 
     def setLast(self, link):
         if link is None or isinstance(link, Link):
+            if self._last:  # If the list is not empty
+                link.setPrevious(self.getLast())  # New last node points to the old last
+                self._last.setNext(link)
             self._last = link
-            if (self._last is None or link is None):
+            if self.getFirst() is None:
                 self._first = link
         else:
             raise Exception("First link must be Link or None.")
@@ -32,67 +38,76 @@ class DoublyLinkedList(LinkedList):
     def insertFirst(self, datum):
         link = Link(datum, next=self.getFirst())
         if self.isEmpty():
-            self.setLast(link)
+            self.setFirst(link)
         else:
             self.getFirst().setPrevious(link)
-        self.setFirst(link)
+            self.setFirst(link)
 
-    insert = insertFirst #overwrite insert()
+    insert = insertFirst  #overwrite insert()
 
     def insertLast(self, datum):
         link = Link(datum, previous=self.getLast())
         if self.isEmpty():
-            self.setFirst(link)
+            self.setLast(link)
         else:
             self.getLast().setNext(link)
-        self.setLast(link)  #Always update _last
+            self.setLast(link)  #Always update _last
 
     def delete(self, goal, key=lambda x: x):
-        link = self.find(goal, key)
-        if link is None:
-            raise Exception("Cannot find link in the list")
-        if link.isLast():
-            return self.deleteLast()
-        elif link.isFirst():
-            return self.deleteFirst()
-        else:
-            link.getNext().setPrevious(link.getPrevious())
-            link.getPrevious().setNext(link.getNext())
-            return link.getData()
-
-    def deleteLast(self):
+        """Deletes a node with the given key."""
         if self.isEmpty():
-            raise Exception("Cannot delete from an empty list.")
+            return Exception("Cannot delete from empty list.")
 
-        data = self.getLast().getData()
-        if self.getFirst() == self.getLast():  # Only one element
-            self.setFirst(None)
-            self.setLast(None)
-        else:
-            self.setLast(self.getLast().getPrevious())
-            self.getLast().setNext(None)
-        return data
+        target_node = self.find(goal, key)
+        if not target_node:
+            return False  # Key not found
 
-    def deleteFirst(self):
-        if self.isEmpty():
-            raise Exception("Cannot delete from an empty list.")
+        if target_node == self.getFirst():
+            self._first = target_node.getNext()
+            if self._first:
+                self._first.setPrevious(None)
 
-        data = self.getFirst().getData()
-        if self.getFirst() == self.getLast():  # Only one element
-            self.setFirst(None)
-            self.setLast(None)
-        else:
-            self.setFirst(self.getFirst().getNext())  #update first
-            self.getFirst().setPrevious(None)
-        return data  # Return deleted data
+        elif target_node == self.getLast():  # If deleting tail
+            self._last = target_node.getPrevious()
+            if self._last:
+                self._last.setNext(None)
+
+        else:  # If deleting a middle node
+            target_node.getPrevious().setNext(target_node.getNext())
+            target_node.getNext().setPrevious(target_node.getPrevious())
+
+        return target_node.getData()
+
+    def traverse_forward(self):
+        """Prints the list from head to tail."""
+        current = self._first
+        while current:
+            print(current.getData(), end=" <-> ")
+            current = current.getNext()
+        print("None")
+
+    def traverse_backward(self):
+        """Prints the list from tail to head."""
+        current = self._last
+        while current:
+            print(current.getData(), end=" <-> ")
+            current = current.getPrevious()
+        print("None")
 
 
 ddl = DoublyLinkedList()
-ddl.insert("a")
+ddl.insert(None)
 ddl.insertLast("c")
+ddl.setFirst(Link(0))
 ddl.insert("b")
 print(ddl)
-print(ddl.delete("b"))
-print(ddl)
-print(ddl.deleteLast())
 
+ddl.setLast(Link("e"))
+print(ddl)
+# print(ddl.delete("c"))
+ddl.delete("b")
+ddl.delete("e")
+print(ddl)
+
+ddl.traverse_forward()
+ddl.traverse_backward()
