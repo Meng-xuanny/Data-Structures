@@ -88,8 +88,6 @@ class Array():
                 min -= 1
             self._a[min]=temp
 
-
-
     def __str__(self):
         return str(self._a[:self._nItems])
 

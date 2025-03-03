@@ -33,10 +33,10 @@ class Stack:
         return str(self._s[:self._top + 1])
 
 
-stack=Stack(4)
-stack.push(2)
-# stack.push(4)
-# stack.push(1)
-print(stack)
+# stack=Stack(4)
+# stack.push(2)
+# # stack.push(4)
+# # stack.push(1)
+# print(stack)
 # print(stack.pop())
 # print(stack.peek())
