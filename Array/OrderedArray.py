@@ -88,6 +88,80 @@ class Array():
                 min -= 1
             self._a[min]=temp
 
+    def shellSort(self):
+        h=1
+        while h<= self._nItems//3:
+            h=h*3 +1
+        while h > 0:
+            for outer in range(h, self._nItems): # we consider elements that are at least h positions apart.
+                temp=self._a[outer]
+                inner = outer
+                while inner> h-1 and temp < self._a[inner-h]:
+                    self._a[inner]=self._a[inner-h]
+                    inner-=h
+                self._a[inner]=temp
+            h=(h-1)//3 #Reduce the Gap, repeats until h = 1, at which point it behaves like a normal Insertion Sort.
+
+    # def partition(self, lo, hi, key):
+    #     pivot = key(self._a[hi])  # Correct pivot selection
+    #     left, right = lo, hi -1  # `right` starts before pivot, if pointing at the pivot,right pointer won't move backwards
+    #
+    #     while left <= right: #swap pairs
+    #         while left <= right and key(self._a[left]) < pivot:
+    #             left += 1
+    #         while left <= right and key(self._a[right]) > pivot:
+    #             right -= 1
+    #         if left <= right:
+    #             self._a[left], self._a[right] = self._a[right], self._a[left]  # Swap
+    #             left += 1
+    #             right -= 1
+    #
+    #     # Move pivot to correct position
+    #     self._a[left], self._a[hi] = self._a[hi], self._a[left]
+    #     return left  # New pivot index
+
+    def median_of_three(self, lo, hi):
+        """Find the median of first, middle, and last elements."""
+        mid = (lo + hi) // 2
+        a, b, c = self._a[lo], self._a[mid], self._a[hi]
+
+        # Find the median value among a, b, c and return its index
+        if (a < b < c) or (c < b < a):
+            return mid  # b is the median
+        elif (b < a < c) or (c < a < b):
+            return lo  # a is the median
+        else:
+            return hi  # c is the median
+
+    def partition(self, lo, hi, key=lambda x: x):
+        # Find the median-of-three pivot index
+        pivot_index = self.median_of_three(lo, hi)
+        self._a[pivot_index], self._a[hi] = self._a[hi], self._a[pivot_index] # Swap pivot to end
+
+        #normal last element as pivot
+        pivot = key(self._a[hi])  # Choose the last element as the pivot
+        i = lo -1  # Pointer for the smaller element
+
+        for j in range(lo, hi):  # Loop through elements
+            if key(self._a[j]) <= pivot:  # If element is smaller than pivot
+                i += 1
+                self._a[i], self._a[j] = self._a[j], self._a[i]  # swap with the first bigger element
+
+        # Swap pivot into correct position
+        self._a[i + 1], self._a[hi] = self._a[hi], self._a[i + 1]
+        return i + 1  # Return pivot index
+
+    def quicksort(self, lo=0, hi=None, key=lambda x: x):
+        if hi is None:
+            hi = self._nItems - 1
+        if lo >= hi:
+            return
+
+        p = self.partition(lo, hi, key)  # Partition the array
+        print(self._a)
+        self.quicksort(lo, p - 1, key)  # Sort left partition, pivot is already at correct place
+        self.quicksort(p + 1, hi, key)  # Sort right partition
+
     def __str__(self):
         return str(self._a[:self._nItems])
 
@@ -103,10 +177,12 @@ array.insert(4)
 array.insert(5)
 array.insert(2)
 array.insert(1)
-array.bubbleSort()
-array.selectionSort()
+# array.bubbleSort()
+# array.selectionSort()
 # #sorting_array.insertionSort()
-# print(array)
+# array.shellSort()
+array.quicksort()
+print(array)
 
 
 

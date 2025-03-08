@@ -1,3 +1,6 @@
+import math
+
+
 def printStars(n):
     if n == 0:
         print()
@@ -90,18 +93,19 @@ def recursiveString(s):
 
 # print(recursiveString("a"))
 
-def isPrime(number, division=2):
-    if number < 2:
+def isPrime(number, divisor=2):
+    if number <= 1:
         return False  # 0 and 1 are not prime
-
-    if division * division > number:  # Stop when division > sqrt(number)
+    if number==2:
+        return True
+    if divisor > math.isqrt(number):  # Stop when division > sqrt(number)
         return True  # No factors found, so it's prime
-    if number % division == 0:
+    if number % divisor == 0:
         return False
-    return isPrime(number, division + 1)
+    return isPrime(number, divisor + 1)
 
 
-# print(isPrime(3))
+# print(isPrime(19))
 
 def mergeSort(a):
     if len(a) <= 1:
@@ -126,15 +130,15 @@ def merge(left, right):
         else:
             merged_list.append(right[j])
             j += 1
-    # Append remaining elements (if any)
-    # merged_list += left[i:] + right[j:]
+    #Append remaining elements (if any)
+    merged_list += left[i:] + right[j:]
 
     return merged_list
 
 
-# arr = [38, 27, 43, 3, 9, 82, 10]
-# sorted_arr = mergeSort(arr)
-# print(sorted_arr)
+arr = [38, 27, 43, 3, 9, 82, 10]
+sorted_arr = mergeSort(arr)
+print(sorted_arr)
 
 
 def perms(lst):
