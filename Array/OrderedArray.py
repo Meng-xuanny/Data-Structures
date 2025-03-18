@@ -133,7 +133,7 @@ class Array():
         else:
             return hi  # c is the median
 
-    def partition(self, lo, hi, key=lambda x: x):
+    def partition(self, lo, hi, key):
         # Find the median-of-three pivot index
         pivot_index = self.median_of_three(lo, hi)
         self._a[pivot_index], self._a[hi] = self._a[hi], self._a[pivot_index] # Swap pivot to end
@@ -144,7 +144,7 @@ class Array():
 
         for j in range(lo, hi):  # Loop through elements
             if key(self._a[j]) <= pivot:  # If element is smaller than pivot
-                i += 1
+                i += 1 #move to the first bigger element
                 self._a[i], self._a[j] = self._a[j], self._a[i]  # swap with the first bigger element
 
         # Swap pivot into correct position

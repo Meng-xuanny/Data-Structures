@@ -15,7 +15,7 @@ def counting_sort(a, exp):
     # Build the sorted output array
     for i in range(n - 1, -1, -1):  # Iterate in reverse for stability
         index = (a[i] // exp) % 10
-        output[count[index] - 1] = a[i]
+        output[count[index] -1] = a[i]
         count[index] -= 1
 
     # Copy sorted elements back to original array
