@@ -1,9 +1,3 @@
-def _minimum(node):
-    """Find the node with the minimum key in the subtree rooted at node."""
-    while node.leftChild:
-        node = node.leftChild
-    return node
-
 
 class RedBlackTree:
     class _Node:
@@ -62,7 +56,7 @@ class RedBlackTree:
                     node.parent.color = self._Node.BLACK
                     uncle.color = self._Node.BLACK
                     node.parent.parent.color = self._Node.RED
-                    node = node.parent.parent
+                    node = node.parent.parent  # moving up the tree
                 else:
                     if node == node.parent.rightChild:
                         node = node.parent
@@ -118,45 +112,52 @@ class RedBlackTree:
         if v:
             v.parent = u.parent
 
+    def _minimum(self, node):
+        """Find the node with the minimum key in the subtree rooted at node."""
+        while node.leftChild:
+            node = node.leftChild
+        return node
+
     def delete(self, key):
         node = self._root
 
-        if node is None:
-            print("Key not found")
-            return
-
+        # Step 1: Find the node to delete
         while node and node.key != key:
             if key < node.key:
                 node = node.leftChild
             else:
                 node = node.rightChild
 
-        original_color = node.color
-        if not node.leftChild:
-            x = node.rightChild
-            self._transplant(node, node.rightChild)
-        elif not node.rightChild:
-            x = node.leftChild
-            self._transplant(node, node.leftChild)
-        else:
-            y = _minimum(node.rightChild)
-            original_color = y.color
-            x = y.rightChild
-            if y.parent == node:
-                x = y
-            else:
-                self._transplant(y, y.rightChild)
-                y.rightChild = node.rightChild
-                if y.rightChild:  # Ensure it's not None before accessing its parent
-                    y.rightChild.parent = y
-            self._transplant(node, y)
-            y.leftChild = node.leftChild
-            y.leftChild.parent = y
-            y.color = node.color
+        if node is None:
+            print("Key not found")
+            return
 
-        if original_color == self._Node.BLACK:
-            if x:
-                self._fix_delete(x)
+        # Step 2: Node has two children
+        if node.leftChild and node.rightChild:
+            successor = self._minimum(node.rightChild)
+            # Copy successor's data into the node
+            node.key = successor.key
+            node.data = successor.data
+            # Now delete the successor (which will have at most one child)
+            node = successor
+
+        # Step 3: Node has one or no children
+        replacement = node.leftChild if node.leftChild else node.rightChild
+
+        # Step 4: Transplant the replacement
+        if replacement:
+            self._transplant(node, replacement)
+        elif node == self._root:
+            self._root = None
+        else:
+            if node == node.parent.leftChild:
+                node.parent.leftChild = None
+            else:
+                node.parent.rightChild = None
+
+        # Step 5: Fix colors if needed
+        if node.color == self._Node.BLACK and replacement:
+            self._fix_delete(replacement)
 
     def _fix_delete(self, x):
         while x != self._root and x.color == 'BLACK':
@@ -224,6 +225,6 @@ rbt.insert(18, 'Data 18')
 print("In-Order Traversal:")
 rbt.inOrderPrint(rbt._root)
 print()
-rbt.delete(15)
+rbt.delete(5)
 print(rbt._root)
 rbt.inOrderPrint(rbt._root)
