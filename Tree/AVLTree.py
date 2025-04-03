@@ -35,90 +35,89 @@ class AVL_Tree:
         toRaise.updateHeight()
         return toRaise
 
-    def _insert(self, node, key, data):
-        if node is None:  # base case
-            return self._Node(key, data)
-
-        if key < node.key:
-            node.left = self._insert(node.left, key, data)
-        elif key > node.key:
-            node.right = self._insert(node.right, key, data)
-        else:
-            node.data = data
-            return node
-
-        node.updateHeight()
-        balance = node.heightDiff()
-
-        if balance > 1:  # left heavy
-            if key < node.left.key:  # left-left heavy
-                return self.rotateRight(node)
-            else:  # left-right heavy
-                node.left = self.rotateLeft(node.left)
-                return self.rotateRight(node)
-
-        if balance < -1:  # right heavy
-            if key > node.right.key:  # right-right heavy
-                return self.rotateLeft(node)
-            else:  # right-left heavy
-                node.right = self.rotateRight(node.right)
-                return self.rotateLeft(node)
-
-        return node
-
     def insert(self, key, data):
         self.root = self._insert(self.root, key, data)  # returns the new root of the subtree
         # and update self.root to point to the new root
+
+    def _insert(self, top, key, data):
+        if top is None:  # base case
+            return self._Node(key, data)
+
+        if key < top.key:
+            top.left = self._insert(top.left, key, data)
+        elif key > top.key:
+            top.right = self._insert(top.right, key, data)
+        else:
+            top.data = data
+            return top
+
+        top.updateHeight()
+        balance = top.heightDiff()
+
+        if balance > 1:  # left heavy
+            if key < top.left.key:  # left-left heavy
+                return self.rotateRight(top)
+            else:  # left-right heavy
+                top.left = self.rotateLeft(top.left)
+                return self.rotateRight(top)
+
+        if balance < -1:  # right heavy
+            if key > top.right.key:  # right-right heavy
+                return self.rotateLeft(top)
+            else:  # right-left heavy
+                top.right = self.rotateRight(top.right)
+                return self.rotateLeft(top)
+
+        return top
+
+    def delete(self, key):
+        self.root = self._delete(self.root, key)
+
+    def _delete(self, top, key):
+        if not top:
+            return top  # Key not found, return unchanged
+
+        # Step 1: Perform standard BST deletion
+        if key < top.key:
+            top.left = self._delete(top.left, key)
+        elif key > top.key:
+            top.right = self._delete(top.right, key)
+        else:
+            # Node with only one child or no child
+            if not top.left:
+                return top.right
+            elif not top.right:
+                return top.left
+            # Node with two children: get the inorder successor (smallest in right subtree)
+            successor = self._minimum(top.right)
+            top.key, top.data = successor.key, successor.data
+            top.right = self._delete(top.right, successor.key)  # Delete successor
+
+        # Step 2: Update height
+        top.updateHeight()
+
+        # Step 3: Check balance factor and re-balance if needed
+        balance = top.heightDiff()
+
+        # Left Heavy (Right Rotation Needed)
+        if balance > 1:
+            if top.left.heightDiff() < 0:  # Left-Right Case
+                top.left = self.rotateLeft(top.left)
+            return self.rotateRight(top)
+
+        # Right Heavy (Left Rotation Needed)
+        if balance < -1:
+            if top.right.heightDiff() > 0:  # Right-Left Case
+                top.right = self.rotateRight(top.right)
+            return self.rotateLeft(top)
+
+        return top  # return the updated top
 
     def _minimum(self, node):
         """Find the node with the minimum key in the subtree rooted at node."""
         while node.left:
             node = node.left
         return node
-
-    def _delete(self, node, key):
-        if not node:
-            return node  # Key not found, return unchanged
-
-        # Step 1: Perform standard BST deletion
-        if key < node.key:
-            node.left = self._delete(node.left, key)
-        elif key > node.key:
-            node.right = self._delete(node.right, key)
-        else:
-            # Node with only one child or no child
-            if not node.left:
-                return node.right
-            elif not node.right:
-                return node.left
-
-            # Node with two children: get the inorder successor (smallest in right subtree)
-            successor = self._minimum(node.right)
-            node.key, node.data = successor.key, successor.data
-            node.right = self._delete(node.right, successor.key)  # Delete successor
-
-        # Step 2: Update height
-        node.updateHeight()
-
-        # Step 3: Check balance factor and re-balance if needed
-        balance = node.heightDiff()
-
-        # Left Heavy (Right Rotation Needed)
-        if balance > 1:
-            if node.left.heightDiff() < 0:  # Left-Right Case
-                node.left = self.rotateLeft(node.left)
-            return self.rotateRight(node)
-
-        # Right Heavy (Left Rotation Needed)
-        if balance < -1:
-            if node.right.heightDiff() > 0:  # Right-Left Case
-                node.right = self.rotateRight(node.right)
-            return self.rotateLeft(node)
-
-        return node  # return the updated node
-
-    def delete(self, key):
-        self.root = self._delete(self.root, key)
 
     def search(self, key):
         return self._search(self.root, key)

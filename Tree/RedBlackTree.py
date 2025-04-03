@@ -18,35 +18,37 @@ class RedBlackTree:
     def __init__(self):
         self._root = None
 
-    def _rotate_left(self, node):
-        right = node.rightChild
-        node.rightChild = right.leftChild
-        if right.leftChild:  # if no right
-            right.leftChild.parent = node
-        right.parent = node.parent
-        if not node.parent:  # if node is root
-            self._root = right
-        elif node == node.parent.leftChild:
-            node.parent.leftChild = right
-        else:
-            node.parent.rightChild = right
-        right.leftChild = node
-        node.parent = right
+    def search(self, key):
+        current = self._root
+        while current:
+            if key == current.key:
+                return current  # Key found, return the node
+            elif key < current.key:
+                current = current.leftChild
+            else:
+                current = current.rightChild
+        return None  # Key not found
 
-    def _rotate_right(self, node):
-        left = node.leftChild
-        node.leftChild = left.rightChild
-        if left.rightChild:
-            left.rightChild.parent = node
-        left.parent = node.parent
-        if not node.parent:
-            self._root = left
-        elif node == node.parent.rightChild:
-            node.parent.rightChild = left
+    def insert(self, key, data):
+        new_node = self._Node(key, data)
+        if not self._root:
+            self._root = new_node
+            self._root.color = self._Node.BLACK
+            return
+        current = self._root
+        parent = None
+        while current:
+            parent = current
+            if key < current.key:
+                current = current.leftChild
+            else:
+                current = current.rightChild
+        new_node.parent = parent
+        if key < parent.key:
+            parent.leftChild = new_node
         else:
-            node.parent.leftChild = left
-        left.rightChild = node
-        node.parent = left
+            parent.rightChild = new_node
+        self._fix_insertion(new_node)  # recursively fix the colors
 
     def _fix_insertion(self, node):
         while node != self._root and node.parent.color == self._Node.RED:
@@ -80,43 +82,35 @@ class RedBlackTree:
                     self._rotate_left(node.parent.parent)
         self._root.color = self._Node.BLACK
 
-    def insert(self, key, data):
-        new_node = self._Node(key, data)
-        if not self._root:
-            self._root = new_node
-            self._root.color = self._Node.BLACK
-            return
-        current = self._root
-        parent = None
-        while current:
-            parent = current
-            if key < current.key:
-                current = current.leftChild
-            else:
-                current = current.rightChild
-        new_node.parent = parent
-        if key < parent.key:
-            parent.leftChild = new_node
+    def _rotate_left(self, node):
+        right = node.rightChild  # Get right child (this is `N`)
+        node.rightChild = right.leftChild  # Move `N`'s left subtree to `P`'s right
+        if right.leftChild:
+            right.leftChild.parent = node  # Update parent reference
+        right.parent = node.parent  # Make `N`'s parent be `P`'s parent
+        if not node.parent:  # If `P` was root, now `N` is the root
+            self._root = right
+        elif node == node.parent.leftChild:
+            node.parent.leftChild = right
         else:
-            parent.rightChild = new_node
-        self._fix_insertion(new_node)  # recursively fix the colors
+            node.parent.rightChild = right
+        right.leftChild = node  # Make `P` the left child of `N`
+        node.parent = right  # Update `P`'s parent to `N`
 
-    def _transplant(self, u, v):
-        """Replace node u with node v in the tree."""
-        if u.parent is None:
-            self._root = v
-        elif u == u.parent.leftChild:
-            u.parent.leftChild = v
+    def _rotate_right(self, node):
+        left = node.leftChild
+        node.leftChild = left.rightChild
+        if left.rightChild:
+            left.rightChild.parent = node  # make N's left child P's left child
+        left.parent = node.parent  # make N's parent P's parent(N's grandparent)
+        if not node.parent:
+            self._root = left
+        elif node == node.parent.rightChild:
+            node.parent.rightChild = left
         else:
-            u.parent.rightChild = v
-        if v:
-            v.parent = u.parent
-
-    def _minimum(self, node):
-        """Find the node with the minimum key in the subtree rooted at node."""
-        while node.leftChild:
-            node = node.leftChild
-        return node
+            node.parent.leftChild = left
+        left.rightChild = node
+        node.parent = left
 
     def delete(self, key):
         node = self._root
@@ -155,61 +149,31 @@ class RedBlackTree:
             else:
                 node.parent.rightChild = None
 
-        # Step 5: Fix colors if needed
-        if node.color == self._Node.BLACK and replacement:
-            self._fix_delete(replacement)
+    def _transplant(self, u, v):
+        """Replace node u with node v in the tree."""
+        if u.parent is None:
+            self._root = v
+        elif u == u.parent.leftChild:
+            u.parent.leftChild = v
+        else:
+            u.parent.rightChild = v
+        if v:
+            v.parent = u.parent
 
-    def _fix_delete(self, x):
-        while x != self._root and x.color == 'BLACK':
-            if x == x.parent.leftChild:
-                sibling = x.parent.rightChild
-                if sibling.color == 'RED':
-                    sibling.color = 'BLACK'
-                    x.parent.color = 'RED'
-                    self._rotate_left(x.parent)
-                    sibling = x.parent.rightChild
-                if sibling.leftChild.color == 'BLACK' and sibling.rightChild.color == 'BLACK':
-                    sibling.color = 'RED'
-                    x = x.parent
-                else:
-                    if sibling.rightChild.color == 'BLACK':
-                        sibling.leftChild.color = 'BLACK'
-                        sibling.color = 'RED'
-                        self._rotate_right(sibling)
-                        sibling = x.parent.rightChild
-                    sibling.color = x.parent.color
-                    x.parent.color = 'BLACK'
-                    sibling.rightChild.color = 'BLACK'
-                    self._rotate_left(x.parent)
-                    x = self._root
-            else:
-                sibling = x.parent.leftChild
-                if sibling.color == 'RED':
-                    sibling.color = 'BLACK'
-                    x.parent.color = 'RED'
-                    self._rotate_right(x.parent)
-                    sibling = x.parent.leftChild
-                if sibling.rightChild.color == 'BLACK' and sibling.leftChild.color == 'BLACK':
-                    sibling.color = 'RED'
-                    x = x.parent
-                else:
-                    if sibling.leftChild.color == 'BLACK':
-                        sibling.rightChild.color = 'BLACK'
-                        sibling.color = 'RED'
-                        self._rotate_left(sibling)
-                        sibling = x.parent.leftChild
-                    sibling.color = x.parent.color
-                    x.parent.color = 'BLACK'
-                    sibling.leftChild.color = 'BLACK'
-                    self._rotate_right(x.parent)
-                    x = self._root
-        x.color = 'BLACK'
+    def _minimum(self, node):
+        """Find the node with the minimum key in the subtree rooted at node."""
+        while node.leftChild:
+            node = node.leftChild
+        return node
 
-    def inOrderPrint(self, cur):
-        if cur:
-            self.inOrderPrint(cur.leftChild)
-            print(cur, end=" ")
-            self.inOrderPrint(cur.rightChild)
+    def inOrderPrint(self):
+        def _inOrderPrintHelper(node):
+            if node:
+                _inOrderPrintHelper(node.leftChild)
+                print(node, end=" ")
+                _inOrderPrintHelper(node.rightChild)
+
+        _inOrderPrintHelper(self._root)
 
 
 # Example usage:
@@ -221,10 +185,17 @@ rbt.insert(3, 'Data 3')
 rbt.insert(7, 'Data 7')
 rbt.insert(12, 'Data 12')
 rbt.insert(18, 'Data 18')
+rbt.insert(8,'Data 8')
 
 print("In-Order Traversal:")
-rbt.inOrderPrint(rbt._root)
+rbt.inOrderPrint()
 print()
-rbt.delete(5)
+rbt.delete(10)
+rbt.inOrderPrint()
+print()
 print(rbt._root)
-rbt.inOrderPrint(rbt._root)
+result = rbt.search(3)
+if result:
+    print(f"Found: {result}")
+else:
+    print("Not found")

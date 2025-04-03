@@ -48,8 +48,8 @@ class Heap:
             self._swap(parent, i)
             self._siftUp(parent)
 
-    def _swap(self, parent, i):
-        parent, i = i, parent
+    def _swap(self, i, j):
+        self._arr[i], self._arr[j] = self._arr[j], self._arr[i]
 
     # remove top item and return it
     def remove(self):
@@ -78,6 +78,8 @@ class Heap:
         if largest != i:
             self._swap(i, largest)
             self._siftDown(largest)  # Continue sifting down
+
+        return    # If i is already the largest node in the heap
 
     def printHeap(self):
         if self.isEmpty():
@@ -130,4 +132,8 @@ heap.insert(20)
 heap.insert(25)
 heap.insert(5)
 heap.insert(10)
+heap.insert(40)
 heap.printHeap()
+heap.remove()
+heap.printHeap()
+
