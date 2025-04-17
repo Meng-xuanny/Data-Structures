@@ -38,7 +38,15 @@ class Graph:
         if A == B:
             raise ValueError("Pseudographs (loops) not allowed")
         self._adjMat[(A, B)] = 1
-        self._adjMat[(B, A)] = 1
+        # self._adjMat[(B, A)] = 1
+
+    def addDirectedEdge(self, A: int, B: int) -> None:
+        """Add a directed edge from A to B"""
+        self.validIndex(A)
+        self.validIndex(B)
+        if A == B:
+            raise ValueError("Pseudographs (loops) not allowed")
+        self._adjMat[(A, B)] = 1  # Only one direction
 
     def hasEdge(self, A: int, B: int) -> bool:
         """Check if there is an edge between A and B"""
@@ -57,6 +65,35 @@ class Graph:
             if j != n and self.hasEdge(n, j):
                 yield j   # Yields (like returns, but one at a time in a loop)
 
+    def predecessorVertices(self, n: int) -> Generator[int, None, None]:
+        """Yield all adjacent vertex indices of vertex n"""
+        self.validIndex(n)
+        for j in self.vertices():
+            if j != n and self.hasEdge(j, n):
+                yield j
+
+    #  Checks if all of vertex n’s predecessors have already been visited.
+    def onlyVisitedPredecessors(self, n: int, visited) ->bool:
+        return all(visited[p] for p in self.predecessorVertices(n))
+
+    #  Finds an unvisited vertex that has no unvisited dependencies
+    def findUnvisitedWithoutPredecessor(self, visited):
+        for vertex in self.vertices():
+            if not visited[vertex] and self.onlyVisitedPredecessors(vertex, visited):
+                return vertex
+        return None
+
+    def sortVerticesTopologically(self):
+        result = []
+        visited = [False] * self.nVertices()
+        while len(result) < self.nVertices():
+            vertex = self.findUnvisitedWithoutPredecessor(visited)
+            if vertex is None:
+                raise Exception("Cycle in graph, cannot sort")
+            result.append(vertex)
+            visited[vertex] = True
+        return result
+
     def adjacentUnvisitedVertices(self, n: int, visited: List[bool], markVisits: bool = True) -> Generator[int, None, None]:
         """Yield adjacent vertices to n that haven't been visited yet"""
         for j in self.adjacentVertices(n):
@@ -65,7 +102,7 @@ class Graph:
                     visited[j] = True
                 yield j
 
-    def depthFirst(self, n: int) -> None:
+    def depthFirstPrint(self, n: int) -> None:
         """Perform depth-first search from vertex index n"""
         self.validIndex(n)
         visited: List[bool] = [False] * self.nVertices()
@@ -105,35 +142,73 @@ class Graph:
     def breadthFirst(self, n: int) -> None:
         """Perform breadth-first search from vertex index n"""
         self.validIndex(n)
-        visited: List[bool] = [False] * self.nVertices()
+        visitedL: List[bool] = [False] * self.nVertices()
         queue = Queue(100)
         queue.insert(n)
-        visited[n] = True
+        visitedL[n] = True
         print("BFS Traversal:")
 
         while not queue.isEmpty():
-            visit = queue.remove()
-            print(self.getVertex(visit), end=' ')
-            for j in self.adjacentUnvisitedVertices(visit, visited):
+            visited = queue.remove()
+            print(self.getVertex(visited), end=' ')
+            for j in self.adjacentUnvisitedVertices(visited, visitedL):
                 queue.insert(j)
         print()
+
+    def depthFirst(self, n: int) -> Generator[Tuple[int, List[int]], None, None]:
+        """Generator-based DFS that yields (vertex, path) for building a spanning tree"""
+        self.validIndex(n)
+        visited: List[bool] = [False] * self.nVertices()
+        stack = [(n, [n])]  # Each stack element is a tuple: (current_vertex, path_to_here)
+        visited[n] = True
+
+        while stack:
+            current, path = stack.pop()
+            yield (current, path)
+
+            for adj in self.adjacentUnvisitedVertices(current, visited):
+                visited[adj] = True
+                stack.append((adj, path + [adj]))
+
+    def minimumSpanningTree(self, n):
+        self.validIndex(n)
+        tree = Graph()  # a new graph to store the MST
+        vMap = [None] * self.nVertices()  # mapping from the original graph’s vertex index to the new graph’s index
+
+        for vertex, path in self.depthFirst(n):  # path is a list of vertex indices
+            vMap[vertex]=tree.nVertices()  # gives the index for the new MST vertex being added
+            tree.addVertex(self.getVertex(vertex))
+
+            if len(path) > 1:
+                tree.addEdge(vMap[path [-2]], vMap[path [-1]])  # (last node, current node)
+
+        return tree
 
 
 if __name__ == "__main__":
     g = Graph()
 
     # Add vertices with labels
-    for label in ['A', 'B', 'C', 'D', 'E']:
+    for label in ['A', 'B', 'C', 'D', 'E','F']:
         g.addVertex(label)
 
     # Create undirected edges by vertex indices
     g.addEdge(0, 1)  # A-B
     g.addEdge(0, 2)  # A-C
     g.addEdge(1, 3)  # B-D
-    g.addEdge(2, 4)  # C-E
+    g.addEdge(2, 3)  # C-E
     g.addEdge(3, 4)  # D-E
+    g.addEdge(4, 5)  # E -> F
 
     # Traversal outputs
-    g.depthFirst(0)  # Output: A B D E C
     g.depthFirstRecursive(0)
     g.breadthFirst(0)  # Output: A B C D E
+
+    # Generate MST starting from A (index 0)
+    mst = g.minimumSpanningTree(0)
+    # Print the MST edges (could use traversal to show it)
+    mst.depthFirstRecursive(0)
+
+    # Topological sort
+    order = g.sortVerticesTopologically()
+    print("Topological Order:", [g.getVertex(i) for i in order])
